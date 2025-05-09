@@ -5,7 +5,7 @@ A simple React hook for storing and retrieving form data from localStorage.
 ## Installation
 
 ```bash
-npm install react-persist
+npm install persist-form-hook
 ```
 
 ## Usage
