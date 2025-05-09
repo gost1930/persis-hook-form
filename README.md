@@ -1,4 +1,4 @@
-# react-persist
+# persist-form-hook
 
 A simple React hook for storing and retrieving form data from localStorage.
 
@@ -11,7 +11,7 @@ npm install persist-form-hook
 ## Usage
 
 ```tsx
-import { usePersist } from "react-persist";
+import { usePersist } from "persist-form-hook";
 
 const MyComponent = () => {
   const { saveForm, getForm, removeForm } = usePersist();
