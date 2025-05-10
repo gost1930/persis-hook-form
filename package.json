@@ -1,6 +1,6 @@
 {
   "name": "persist-form-hook",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A custom React hook for persisting form data in localStorage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,10 +8,10 @@
     "build": "tsc"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.1.0",
+    "@types/react": "^19.1.0",
     "typescript": "^5.0.0"
   },
   "keywords": [
