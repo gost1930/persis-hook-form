@@ -1,28 +1,34 @@
 # persist-form-hook
 
-A simple React hook for storing and retrieving form data from localStorage.
+A simple React hook for storing and retrieving form data from `localStorage`.  
+✅ Now supports functional updates (callback) to merge new data with previously saved form data.
 
 ## Installation
 
 ```bash
 npm install persist-form-hook
-```
-or  if you have any error from react v 
-run this command:
+If you have any issues due to React version compatibility, try:
 
-```bash
+bash
+Copy
+Edit
 npm install persist-form-hook --legacy-peer-deps
-```
-## Usage
-
-```tsx
+Usage
+tsx
+Copy
+Edit
 import { usePersist } from "persist-form-hook";
 
 const MyComponent = () => {
   const { saveForm, getForm, removeForm } = usePersist();
 
   const handleSave = () => {
-    saveForm("myForm", { name: "gost", age: 23 });
+    // Merge with previous data using a callback
+    saveForm("myForm", (prev) => ({
+      ...prev,
+      name: "gost",
+      age: 23,
+    }));
   };
 
   const handleLoad = () => {
@@ -43,16 +49,19 @@ const MyComponent = () => {
   );
 };
 ```
+# API
+saveForm(formName: string, data: Record<string, any> | (prev: Record<string, any>) => Record<string, any>)
+Saves or updates form data into localStorage.
+You can now pass either:
 
-## API
+An object (replaces previous data), or
 
-### `saveForm(formName: string, data: Record<string, any>)`
-Stores the form data under the given name.
+A callback function (prevData) => newData to merge with previous data.
 
-### `getForm(formName: string): Record<string, any> | null`
-Retrieves the form data by name.
+getForm(formName: string): Record<string, any> | null
+Retrieves the form data saved under the given name. Returns null if not found.
 
-### `removeForm(formName: string)`
-Removes the saved form data.
+removeForm(formName: string)
+Removes the form data for the given name from localStorage.
 
----
+Made with ❤️ by gost1930
