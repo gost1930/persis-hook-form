@@ -46,7 +46,7 @@ const MyComponent = () => {
     </div>
   );
 };
-```
+`````
 # API
 saveForm(formName: string, data: Record<string, any> | (prev: Record<string, any>) => Record<string, any>)
 Saves or updates form data into localStorage.
