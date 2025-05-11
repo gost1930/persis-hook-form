@@ -1,11 +1,21 @@
 import { useCallback } from "react";
 
+type FormData = Record<string, any>;
+type SaveFormArg = FormData | ((prev: FormData) => FormData);
+
 export function usePersist() {
-  const saveForm = useCallback((formName: string, data: Record<string, any>) => {
-    localStorage.setItem(`react-persist:${formName}`, JSON.stringify(data));
+  const saveForm = useCallback((formName: string, data: SaveFormArg) => {
+    const key = `react-persist:${formName}`;
+    const prevDataRaw = localStorage.getItem(key);
+    const prevData: FormData = prevDataRaw ? JSON.parse(prevDataRaw) : {};
+
+    const newData =
+      typeof data === "function" ? (data as (prev: FormData) => FormData)(prevData) : data;
+
+    localStorage.setItem(key, JSON.stringify(newData));
   }, []);
 
-  const getForm = useCallback((formName: string): Record<string, any> | null => {
+  const getForm = useCallback((formName: string): FormData | null => {
     const data = localStorage.getItem(`react-persist:${formName}`);
     return data ? JSON.parse(data) : null;
   }, []);
