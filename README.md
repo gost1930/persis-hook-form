@@ -6,17 +6,15 @@ A simple React hook for storing and retrieving form data from `localStorage`.
 ## Installation
 
 ```bash
-npm install persist-form-hook
+npm install persist-form-hook 
+```
 If you have any issues due to React version compatibility, try:
 
-bash
-Copy
-Edit
+```bash
 npm install persist-form-hook --legacy-peer-deps
+```
 Usage
-tsx
-Copy
-Edit
+`````bash
 import { usePersist } from "persist-form-hook";
 
 const MyComponent = () => {
