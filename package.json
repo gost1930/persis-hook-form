@@ -1,6 +1,6 @@
 {
   "name": "persist-form-hook",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A custom React hook for persisting form data in localStorage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
