@@ -1,28 +1,85 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react"
 
-type FormData = Record<string, any>;
-type SaveFormArg = FormData | ((prev: FormData) => FormData);
+interface Options {
+  storage?: "local" | "session";
+  expiresIn?: number;
+  defaultValues?: Record<string, any>;
+  onSave?: (data: any) => void;
+  onLoad?: (data: any) => void;
+  onRemove?: () => void;
+}
 
-export function usePersist() {
-  const saveForm = useCallback((formName: string, data: SaveFormArg) => {
-    const key = `react-persist:${formName}`;
-    const prevDataRaw = localStorage.getItem(key);
-    const prevData: FormData = prevDataRaw ? JSON.parse(prevDataRaw) : {};
+const getStorage = (type: "local" | "session") =>
+  type === "session" ? sessionStorage : localStorage
 
-    const newData =
-      typeof data === "function" ? (data as (prev: FormData) => FormData)(prevData) : data;
+const isExpired = (timestamp: number, expiresIn: number): boolean => {
+  return Date.now() > timestamp + expiresIn * 1000
+}
 
-    localStorage.setItem(key, JSON.stringify(newData));
-  }, []);
+export const usePersist = (key: string, options?: Options) => {
+  const {
+    storage = "local",
+    expiresIn,
+    defaultValues = {},
+    onSave,
+    onLoad,
+    onRemove,
+  } = options || {}
 
-  const getForm = useCallback((formName: string): FormData | null => {
-    const data = localStorage.getItem(`react-persist:${formName}`);
-    return data ? JSON.parse(data) : null;
-  }, []);
+  const store = getStorage(storage)
+  const [formValues, setFormValues] = useState<Record<string, any>>(() => {
+    try {
+      const raw = store.getItem(key)
+      if (!raw) return defaultValues
+      const parsed = JSON.parse(raw)
+      if (expiresIn && isExpired(parsed._ts, expiresIn)) {
+        store.removeItem(key)
+        return defaultValues
+      }
+      onLoad?.(parsed.data)
+      return parsed.data
+    } catch (err) {
+      return defaultValues
+    }
+  })
 
-  const removeForm = useCallback((formName: string) => {
-    localStorage.removeItem(`react-persist:${formName}`);
-  }, []);
+  const saveForm = useCallback(
+    (fnOrData: Record<string, any> | ((prev: any) => any)) => {
+      setFormValues((prev) => {
+        const newData = typeof fnOrData === "function" ? fnOrData(prev) : fnOrData
+        const toSave = {
+          data: newData,
+          _ts: Date.now(),
+        }
+        store.setItem(key, JSON.stringify(toSave))
+        onSave?.(newData)
+        return newData
+      })
+    },
+    [key, store]
+  )
 
-  return { saveForm, getForm, removeForm };
+  const removeForm = useCallback(() => {
+    store.removeItem(key)
+    setFormValues(defaultValues)
+    onRemove?.()
+  }, [key, store])
+
+  const bindInput = (name: string) => {
+    return {
+      name,
+      value: formValues[name] || "",
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { value } = e.target
+        saveForm((prev) => ({ ...prev, [name]: value }))
+      },
+    }
+  }
+
+  return {
+    formValues,
+    saveForm,
+    removeForm,
+    bindInput,
+  }
 }
